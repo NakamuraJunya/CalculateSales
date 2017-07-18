@@ -1,0 +1,297 @@
+package jp.alhinc.nakamura_junya.calculate_sales;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+class SalesFile {
+	public static void main(String args[]) {
+
+		//Map一覧
+		HashMap< String , String> branchNameMap = new HashMap < String , String>();
+		HashMap< String , String> commodityNameMap = new HashMap < String , String>();
+		HashMap< String , Long> branchSaleMap = new HashMap < String , Long>();
+		HashMap< String , Long> commoditySaleMap = new HashMap < String , Long>();
+
+		BufferedReader br = null;
+		BufferedWriter bw = null;
+
+		//支店定義ファイル
+		try{
+
+			File file = new File((args[0]+"\\branch.lst"));
+
+			br = new BufferedReader(new FileReader(file));
+
+			String a ;
+
+			while((a = br.readLine())!= null){
+
+				String[] Branch = a.split(",",0);
+				branchNameMap.put(Branch[0],Branch[1]);
+				branchSaleMap.put(Branch[0],0L);
+
+				if(!Branch[0].matches("\\d{3}")){
+					System.out.println("支店定義ファイルのフォーマットが不正です");
+
+					return;
+				}
+
+			}
+
+		}catch (FileNotFoundException e) {
+			System.out.println("支店定義ファイルが存在しません");
+
+			return;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		} finally{
+			if (br != null)
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		//商品定義ファイル
+		try{
+
+			File file = new File((args[0]+"\\commodity.lst"));
+
+			br = new BufferedReader(new FileReader(file));
+
+			String a ;
+
+			while((a = br.readLine())!= null){
+
+				String[] commodity = a.split(",",0);
+				commodityNameMap.put(commodity[0],commodity[1]);
+				commoditySaleMap.put(commodity[0],0L);
+
+				if(!commodity[0].matches("\\w{8}")){
+					System.out.println("商品定義ファイルのフォーマットが不正です");
+
+					return;
+				}
+			}
+
+		}catch (FileNotFoundException e) {
+			System.out.println("商品定義ファイルが存在しません");
+			return;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		} finally {
+			if (br != null)
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		//Mapの中身確認
+		//System.out.println(branchNameMap);
+		//System.out.println(commodityNameMap);
+		//System.out.println(branchSaleMap);
+		//System.out.println(commoditySaleMap);
+
+		//Mapの値確認
+		//System.out.println(branchNameMap.values());
+		//System.out.println(commodityNameMap.values());
+		//System.out.println(branchSaleMap.values());
+		//System.out.println(commoditySaleMap.values());
+
+		//売上集計リスト
+		File rcdCord = new File(args[0]);
+		File files[] = rcdCord.listFiles();
+		ArrayList <File> salesList1 = new ArrayList<File>();
+
+		for (int i=0; i<files.length; i++) {
+			//System.out.println("ファイル" + (i+1) + "→" + files[i]); //ディレクトリ一覧読み込み
+
+			//String filename =files[i].getName();
+			//System.out.println(filename); //フォルダー内の確認
+
+			if(files[i].getName().matches("\\d{8}.rcd$")){
+				//System.out.println(filename); //フォルダーを必要なものに仕分け
+
+				salesList1.add(files[i]);
+
+				int name = Integer.parseInt(salesList1.get(i).getName().substring(0,8));
+				
+				System.out.println(name);
+
+				//System.out.println(filename);
+				//System.out.println(salesList1.get(i)); //売上ファイルのみの読み込み確認
+			}
+		}
+		try{
+			for (int i=0; i<salesList1.size(); i++) {
+
+				br = new BufferedReader(new FileReader(salesList1.get(i)));
+
+				String List;
+				ArrayList <String> salesList2 = new ArrayList<String>();
+
+				while ((List = br.readLine()) != null) {
+
+					//System.out.println(List); //すべての売上ファイルの中身の出力確認
+
+					salesList2.add(List);;
+					//System.out.println(branchSaleMap.get("001"));//キーの確認
+				}
+				//System.out.println(salesList2); //売上ファイルを一行ずつ読み込み確認
+				//System.out.println(salesList2.get(2)); //売上額確認
+
+				Long branch=branchSaleMap.get(salesList2.get(0));
+				Long commodity=commoditySaleMap.get(salesList2.get(1));
+
+				//System.out.println(commodity += Long.parseLong(salesList2.get(2)));//MapとListの出力確認
+
+				branch += Long.parseLong(salesList2.get(2));
+				commodity += Long.parseLong(salesList2.get(2));
+
+				branchSaleMap.put(salesList2.get(0),branch);
+				commoditySaleMap.put(salesList2.get(1),commodity);
+
+			}
+		}catch (FileNotFoundException e) {
+			System.out.println(e);
+			return;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		} finally {
+			if (br != null)
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.out.println("予期せぬエラーが発生しました");
+				}
+		}
+		//支店ならびに商品別集計ファイルの作成
+		/*File newfile = new File(args[0],"branch.out");
+		try {
+			if (newfile.createNewFile()) {
+				System.out.println("ファイルの作成に成功しました。");
+			} else {
+				System.out.println("ファイルの作成に失敗しました。");
+			}
+		} catch (IOException e) {
+			System.out.println("例外が発生しました。");
+			System.out.println(e);
+		}
+		File newfiles = new File(args[0],"Commodity.out");
+		try {
+			if (newfiles.createNewFile()) {
+				System.out.println("ファイルの作成に成功しました。");
+			} else {
+				System.out.println("ファイルの作成に失敗しました。");
+			}
+		} catch (IOException e) {
+			System.out.println("例外が発生しました。");
+			System.out.println(e);
+		}*/
+
+		List<Map.Entry<String,Long>> branchentries =new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
+
+		Collections.sort(branchentries, new Comparator<Map.Entry<String,Long>>() {
+			@Override
+			public int compare(
+					Entry<String,Long> entry1, Entry<String,Long> entry2) {
+				return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());}
+
+		});
+
+		/*for (Entry<String,Long> g : branchentries) {
+			System.out.println("g.getKey() : " + g.getKey());
+			System.out.println("g.getValue() : " + g.getValue());
+		 *///降順の確認
+
+		//支店別集計ファイルの出力
+		try{
+
+			File file = new File(args[0],"branch.out");
+			FileWriter fw = new FileWriter(file);
+			bw = new BufferedWriter(fw);
+
+			for (Entry<String,Long> g : branchentries) {
+				bw.write(g.getKey() +"," +  branchNameMap.get(g.getKey()) +"," + (g.getValue()) + "\r\n");
+			}
+			bw.close();
+
+		}catch (IOException e) {
+			e.printStackTrace();
+
+		} finally {
+			if (bw != null)
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+
+		List<Map.Entry<String,Long>> commodityentries =new ArrayList<Map.Entry<String,Long>>(commoditySaleMap.entrySet());
+
+		Collections.sort(commodityentries, new Comparator<Map.Entry<String,Long>>() {
+			@Override
+			public int compare(
+					Entry<String,Long> entry1, Entry<String,Long> entry2) {
+				return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());}
+
+		});
+
+		/*for (Entry<String,Long> g : branchentries) {
+		System.out.println("g.getKey() : " + g.getKey());
+		System.out.println("g.getValue() : " + g.getValue());
+		 *///降順の確認
+
+		//商品別集計ファイルの出力
+		try{
+
+			File file = new File(args[0],"Commodity.out");
+			FileWriter fw = new FileWriter(file);
+			bw = new BufferedWriter(fw);
+
+			for (Entry<String,Long> g : commodityentries) {
+				bw.write(g.getKey() +"," +  commodityNameMap.get(g.getKey()) +"," + (g.getValue()) + "\r\n");
+			}
+			bw.close();
+
+		}catch (IOException e) {
+			e.printStackTrace();
+
+		} finally {
+			if (bw != null)
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		System.out.println(branchSaleMap.entrySet());//支店売上出力確認
+		System.out.println(commoditySaleMap.entrySet());//商品売上出力確認
+	}
+
+}
+
+
+
+
