@@ -57,6 +57,7 @@ class SalesFile {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("予期せぬエラーが発生しました");
 
 		} finally{
 			if (br != null)
@@ -64,6 +65,7 @@ class SalesFile {
 					br.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					System.out.println("予期せぬエラーが発生しました");
 				}
 		}
 		//商品定義ファイル
@@ -94,6 +96,7 @@ class SalesFile {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("予期せぬエラーが発生しました");
 
 		} finally {
 			if (br != null)
@@ -101,6 +104,7 @@ class SalesFile {
 					br.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					System.out.println("予期せぬエラーが発生しました");
 				}
 		}
 		//Mapの中身確認
@@ -119,6 +123,7 @@ class SalesFile {
 		File rcdCord = new File(args[0]);
 		File files[] = rcdCord.listFiles();
 		ArrayList <File> salesList1 = new ArrayList<File>();
+		ArrayList <Integer> salesList2 = new ArrayList<Integer>();
 
 		for (int i=0; i<files.length; i++) {
 			//System.out.println("ファイル" + (i+1) + "→" + files[i]); //ディレクトリ一覧読み込み
@@ -131,12 +136,25 @@ class SalesFile {
 
 				salesList1.add(files[i]);
 
-				int name = Integer.parseInt(salesList1.get(i).getName().substring(0,8));
-				
-				System.out.println(name);
+				//System.out.println(salesList1);
 
+				int name=Integer.parseInt(salesList1.get(i).getName().substring(0,8));;
+
+				salesList2.add(name);
+				//System.out.println(salesList1);
+				//System.out.println(salesList2);
 				//System.out.println(filename);
 				//System.out.println(salesList1.get(i)); //売上ファイルのみの読み込み確認
+			}
+		}
+		for(int t =0; t<salesList2.size()-1; t++){
+
+			//System.out.println(salesList2.get(1));
+
+			int  name1 = salesList2.get(t+1) - salesList2.get(t);
+			if( name1!=1 ){
+				System.out.println("売上ファイル名が連番になっていません");
+				return;
 			}
 		}
 		try{
@@ -145,36 +163,58 @@ class SalesFile {
 				br = new BufferedReader(new FileReader(salesList1.get(i)));
 
 				String List;
-				ArrayList <String> salesList2 = new ArrayList<String>();
+				ArrayList <String> salesList3 = new ArrayList<String>();
 
 				while ((List = br.readLine()) != null) {
 
 					//System.out.println(List); //すべての売上ファイルの中身の出力確認
 
-					salesList2.add(List);;
+					salesList3.add(List);;
 					//System.out.println(branchSaleMap.get("001"));//キーの確認
 				}
-				//System.out.println(salesList2); //売上ファイルを一行ずつ読み込み確認
-				//System.out.println(salesList2.get(2)); //売上額確認
 
-				Long branch=branchSaleMap.get(salesList2.get(0));
-				Long commodity=commoditySaleMap.get(salesList2.get(1));
+				//System.out.println(salesList3); //売上ファイルを一行ずつ読み込み確認
+				//System.out.println(salesList3.get(2)); //売上額確認
+
+				if (!branchNameMap.containsKey(salesList3.get(0))){
+					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "の支店コードが不正です");
+					return;
+				}
+
+				if (!commodityNameMap.containsKey(salesList3.get(1))){
+					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "の商品コードが不正です");
+					return;
+				}
+
+				if (salesList3.size() >3){
+					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "のフォーマットが不正です");
+					return;
+				}
+
+				Long branch=branchSaleMap.get(salesList3.get(0));
+				Long commodity=commoditySaleMap.get(salesList3.get(1));
 
 				//System.out.println(commodity += Long.parseLong(salesList2.get(2)));//MapとListの出力確認
 
-				branch += Long.parseLong(salesList2.get(2));
-				commodity += Long.parseLong(salesList2.get(2));
+				branch += Long.parseLong(salesList3.get(2));
+				commodity += Long.parseLong(salesList3.get(2));
 
-				branchSaleMap.put(salesList2.get(0),branch);
-				commoditySaleMap.put(salesList2.get(1),commodity);
+				branchSaleMap.put(salesList3.get(0),branch);
+				commoditySaleMap.put(salesList3.get(1),commodity);
+				//System.out.println(salesList3.get(2));
 
+				if(!salesList3.get(2).matches("\\d{0,10}")){
+					System.out.println("合計金額が10桁を超えました");
+					return;
+				}
 			}
 		}catch (FileNotFoundException e) {
-			System.out.println(e);
+			System.out.println("予期せぬエラーが発生しました");
 			return;
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("予期せぬエラーが発生しました");
 
 		} finally {
 			if (br != null)
@@ -238,6 +278,7 @@ class SalesFile {
 
 		}catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("予期せぬエラーが発生しました");
 
 		} finally {
 			if (bw != null)
@@ -245,6 +286,7 @@ class SalesFile {
 					bw.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					System.out.println("予期せぬエラーが発生しました");
 				}
 		}
 
@@ -277,6 +319,7 @@ class SalesFile {
 
 		}catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("予期せぬエラーが発生しました");
 
 		} finally {
 			if (bw != null)
@@ -284,13 +327,16 @@ class SalesFile {
 					bw.close();
 				} catch (IOException e) {
 					e.printStackTrace();
+					System.out.println("予期せぬエラーが発生しました");
 				}
+			System.out.println(branchSaleMap.entrySet());//支店売上出力確認
+			System.out.println(commoditySaleMap.entrySet());//商品売上出力確認
 		}
-		System.out.println(branchSaleMap.entrySet());//支店売上出力確認
-		System.out.println(commoditySaleMap.entrySet());//商品売上出力確認
 	}
-
 }
+
+
+
 
 
 
