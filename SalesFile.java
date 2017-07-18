@@ -18,6 +18,11 @@ import java.util.Map.Entry;
 class SalesFile {
 	public static void main(String args[]) {
 
+		if (args.length != 1){
+			System.out.println("予期せぬエラーが発生しました");
+			return;
+		}
+
 		//Map一覧
 		HashMap< String , String> branchNameMap = new HashMap < String , String>();
 		HashMap< String , String> commodityNameMap = new HashMap < String , String>();
@@ -30,7 +35,7 @@ class SalesFile {
 		//支店定義ファイル
 		try{
 
-			File file = new File((args[0]+"\\branch.lst"));
+			File file = new File(args[0],"branch.out");
 
 			br = new BufferedReader(new FileReader(file));
 
@@ -71,7 +76,7 @@ class SalesFile {
 		//商品定義ファイル
 		try{
 
-			File file = new File((args[0]+"\\commodity.lst"));
+			File file = new File(args[0],"commodity.lst");
 
 			br = new BufferedReader(new FileReader(file));
 
@@ -116,7 +121,7 @@ class SalesFile {
 
 		for (int i=0; i<files.length; i++) {
 
-			if(files[i].getName().matches("\\d{8}.rcd$")){
+			if(files[i].getName().matches("\\d{8}.rcd$")&&(files[i].isFile())){
 
 				salesList1.add(files[i]);
 
@@ -162,6 +167,10 @@ class SalesFile {
 
 				if (salesList3.size() >3){
 					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "のフォーマットが不正です");
+					return;
+				}
+				if(!salesList3.get(2).matches("^\\d{0,9}$")){
+					System.out.println("予期せぬエラーが発生しました");
 					return;
 				}
 
