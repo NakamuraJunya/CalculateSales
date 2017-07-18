@@ -107,17 +107,6 @@ class SalesFile {
 					System.out.println("予期せぬエラーが発生しました");
 				}
 		}
-		//Mapの中身確認
-		//System.out.println(branchNameMap);
-		//System.out.println(commodityNameMap);
-		//System.out.println(branchSaleMap);
-		//System.out.println(commoditySaleMap);
-
-		//Mapの値確認
-		//System.out.println(branchNameMap.values());
-		//System.out.println(commodityNameMap.values());
-		//System.out.println(branchSaleMap.values());
-		//System.out.println(commoditySaleMap.values());
 
 		//売上集計リスト
 		File rcdCord = new File(args[0]);
@@ -126,25 +115,15 @@ class SalesFile {
 		ArrayList <Integer> salesList2 = new ArrayList<Integer>();
 
 		for (int i=0; i<files.length; i++) {
-			//System.out.println("ファイル" + (i+1) + "→" + files[i]); //ディレクトリ一覧読み込み
-
-			//String filename =files[i].getName();
-			//System.out.println(filename); //フォルダー内の確認
 
 			if(files[i].getName().matches("\\d{8}.rcd$")){
-				//System.out.println(filename); //フォルダーを必要なものに仕分け
 
 				salesList1.add(files[i]);
-
-				//System.out.println(salesList1);
 
 				int name=Integer.parseInt(salesList1.get(i).getName().substring(0,8));;
 
 				salesList2.add(name);
-				//System.out.println(salesList1);
-				//System.out.println(salesList2);
-				//System.out.println(filename);
-				//System.out.println(salesList1.get(i)); //売上ファイルのみの読み込み確認
+
 			}
 		}
 		for(int t =0; t<salesList2.size()-1; t++){
@@ -167,14 +146,9 @@ class SalesFile {
 
 				while ((List = br.readLine()) != null) {
 
-					//System.out.println(List); //すべての売上ファイルの中身の出力確認
-
 					salesList3.add(List);;
-					//System.out.println(branchSaleMap.get("001"));//キーの確認
-				}
 
-				//System.out.println(salesList3); //売上ファイルを一行ずつ読み込み確認
-				//System.out.println(salesList3.get(2)); //売上額確認
+				}
 
 				if (!branchNameMap.containsKey(salesList3.get(0))){
 					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "の支店コードが不正です");
@@ -226,7 +200,7 @@ class SalesFile {
 				}
 		}
 		//支店ならびに商品別集計ファイルの作成
-		/*File newfile = new File(args[0],"branch.out");
+		File newfile = new File(args[0],"branch.out");
 		try {
 			if (newfile.createNewFile()) {
 				System.out.println("ファイルの作成に成功しました。");
@@ -247,7 +221,7 @@ class SalesFile {
 		} catch (IOException e) {
 			System.out.println("例外が発生しました。");
 			System.out.println(e);
-		}*/
+		}
 
 		List<Map.Entry<String,Long>> branchentries =new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
 
@@ -258,11 +232,6 @@ class SalesFile {
 				return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());}
 
 		});
-
-		/*for (Entry<String,Long> g : branchentries) {
-			System.out.println("g.getKey() : " + g.getKey());
-			System.out.println("g.getValue() : " + g.getValue());
-		 *///降順の確認
 
 		//支店別集計ファイルの出力
 		try{
@@ -300,11 +269,6 @@ class SalesFile {
 
 		});
 
-		/*for (Entry<String,Long> g : branchentries) {
-		System.out.println("g.getKey() : " + g.getKey());
-		System.out.println("g.getValue() : " + g.getValue());
-		 *///降順の確認
-
 		//商品別集計ファイルの出力
 		try{
 
@@ -329,8 +293,6 @@ class SalesFile {
 					e.printStackTrace();
 					System.out.println("予期せぬエラーが発生しました");
 				}
-			System.out.println(branchSaleMap.entrySet());//支店売上出力確認
-			System.out.println(commoditySaleMap.entrySet());//商品売上出力確認
 		}
 	}
 }
