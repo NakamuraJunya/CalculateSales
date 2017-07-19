@@ -288,8 +288,6 @@ class SalesFile {
 					return;
 				}
 		}
-		System.out.println(branchSaleMap);
-		System.out.println(commoditySaleMap);
 	}
 }
 
