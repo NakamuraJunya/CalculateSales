@@ -228,29 +228,8 @@ class SalesFile {
 		}
 		//支店ならびに商品別集計ファイルの作成
 		File newfile = new File(args[0],"branch.out");
-		try {
-			if (newfile.createNewFile()) {
-				System.out.println("ファイルの作成に成功しました。");
-			} else {
-				System.out.println("ファイルの作成に失敗しました。");
-			}
-		} catch (IOException e) {
-			System.out.println("例外が発生しました。");
-			return;
-		}
 
 		File newfiles = new File(args[0],"commodity.out");
-
-		try {
-			if (newfiles.createNewFile()) {
-				System.out.println("ファイルの作成に成功しました。");
-			} else {
-				System.out.println("ファイルの作成に失敗しました。");
-			}
-		} catch (IOException e) {
-			System.out.println("例外が発生しました。");
-			return;
-		}
 
 		List<Map.Entry<String,Long>> branchentries =new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
 
@@ -325,8 +304,6 @@ class SalesFile {
 					return;
 				}
 		}
-		System.out.println(branchSaleMap);
-		System.out.println(commoditySaleMap);
 	}
 }
 
