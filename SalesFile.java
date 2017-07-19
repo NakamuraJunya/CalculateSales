@@ -50,7 +50,7 @@ class SalesFile {
 
 				String[] branch = branchreadfile.split(",");
 
-				if(!(branch.length >=2)){
+				if(branch.length !=2){
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 					return;
 				}
@@ -99,7 +99,7 @@ class SalesFile {
 
 				String[] commodity = commodityreadfile.split(",");
 
-				if(!(commodity.length >=2)){
+				if(commodity.length !=2){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
 					return;
 				}
@@ -143,7 +143,7 @@ class SalesFile {
 
 				salesList1.add(files[i]);
 
-				int name=Integer.parseInt(salesList1.get(i).getName().substring(0,8));
+				int name=Integer.parseInt(files[i].getName().substring(0,8));
 
 				salesList2.add(name);
 
@@ -172,6 +172,10 @@ class SalesFile {
 					salesList3.add(List);
 
 				}
+				if (salesList3.size()!=3){
+					System.out.println(salesList1.get(i) .getName() + "のフォーマットが不正です");
+					return;
+				}
 
 				if (!branchNameMap.containsKey(salesList3.get(0))){
 					System.out.println(salesList1.get(i) .getName() + "の支店コードが不正です");
@@ -183,15 +187,6 @@ class SalesFile {
 					return;
 				}
 
-				if (salesList3.size() >3){
-					System.out.println(salesList1.get(i) .getName() + "のフォーマットが不正です");
-					return;
-				}
-				if(!salesList3.get(2).matches("^\\d{0,9}$")){
-					System.out.println("予期せぬエラーが発生しました");
-					return;
-				}
-
 				Long branch=branchSaleMap.get(salesList3.get(0));
 				Long commodity=commoditySaleMap.get(salesList3.get(1));
 
@@ -200,14 +195,13 @@ class SalesFile {
 				branch += Long.parseLong(salesList3.get(2));
 				commodity += Long.parseLong(salesList3.get(2));
 
-				branchSaleMap.put(salesList3.get(0),branch);
-				commoditySaleMap.put(salesList3.get(1),commodity);
-				//System.out.println(salesList3.get(2));
-
-				if(!salesList3.get(2).matches("\\d{0,10}")){
+				if(!(branch<=9999999999L)||!(commodity<=9999999999L)){
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
+				branchSaleMap.put(salesList3.get(0),branch);
+				commoditySaleMap.put(salesList3.get(1),commodity);
+				//System.out.println(salesList3.get(2));
 			}
 		}catch (FileNotFoundException e) {
 			System.out.println("予期せぬエラーが発生しました");
