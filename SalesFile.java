@@ -50,17 +50,10 @@ class SalesFile {
 
 				String[] branch = branchreadfile.split(",");
 
-				if(branch.length !=2){
+				if(!branch[0].matches("\\d{3}")&&(branch.length !=2)){
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 					return;
 				}
-
-				if(!branch[0].matches("\\d{3}")){
-					System.out.println("支店定義ファイルのフォーマットが不正です");
-
-					return;
-				}
-
 				branchNameMap.put(branch[0],branch[1]);
 				branchSaleMap.put(branch[0],0L);
 			}
@@ -99,18 +92,12 @@ class SalesFile {
 
 				String[] commodity = commodityreadfile.split(",");
 
-				if(commodity.length !=2){
+				if(!commodity[0].matches("\\w{8}")&&(commodity.length !=2)){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
 					return;
 				}
-
 				commodityNameMap.put(commodity[0],commodity[1]);
 				commoditySaleMap.put(commodity[0],0L);
-
-				if(!commodity[0].matches("\\w{8}")){
-					System.out.println("商品定義ファイルのフォーマットが不正です");
-					return;
-				}
 			}
 
 		}catch (FileNotFoundException e) {
@@ -170,10 +157,13 @@ class SalesFile {
 				while ((List = br.readLine()) != null) {
 
 					salesList3.add(List);
-
 				}
 				if (salesList3.size()!=3){
 					System.out.println(salesList1.get(i) .getName() + "のフォーマットが不正です");
+					return;
+				}
+				if(!salesList3.get(2).matches("^\\d{0,9}$")){
+					System.out.println("予期せぬエラーが発生しました");
 					return;
 				}
 
