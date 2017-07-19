@@ -23,104 +23,20 @@ class SalesFile {
 			return;
 		}
 
-		// Map一覧
 		HashMap<String, String> branchNameMap = new HashMap<String, String>();
 		HashMap<String, String> commodityNameMap = new HashMap<String, String>();
 		HashMap<String, Long> branchSaleMap = new HashMap<String, Long>();
 		HashMap<String, Long> commoditySaleMap = new HashMap<String, Long>();
 
 		BufferedReader br = null;
-		BufferedWriter bw = null;
 
-		// 支店定義ファイル
-		try {
-
-			File file = new File(args[0], "branch.lst");
-
-			if (!file.exists()) {
-				System.out.println("支店定義ファイルが存在しません");
-				return;
-			}
-
-			br = new BufferedReader(new FileReader(file));
-
-			String branchreadfile;
-
-			while ((branchreadfile = br.readLine()) != null) {
-
-				String[] branch = branchreadfile.split(",");
-
-				if (!branch[0].matches("\\d{3}") || (branch.length != 2)) {
-					System.out.println("支店定義ファイルのフォーマットが不正です");
-					return;
-				}
-				branchNameMap.put(branch[0], branch[1]);
-				branchSaleMap.put(branch[0], 0L);
-			}
-
-		} catch (FileNotFoundException e) {
-			System.out.println("支店定義ファイルが存在しません");
+		if(! folders (args[0],"branch.lst", "支店","\\d{3}",branchNameMap,branchSaleMap)){
 			return;
-
-		} catch (IOException e) {
-			System.out.println("予期せぬエラーが発生しました");
-			return;
-
-		} finally {
-			if (br != null){
-				try {
-					br.close();
-				} catch (IOException e) {
-					System.out.println("予期せぬエラーが発生しました");
-					return;
-				}
-			}
 		}
-		// 商品定義ファイル
-		try {
-
-			File file = new File(args[0], "commodity.lst");
-			if (!file.exists()) {
-				System.out.println("商品定義ファイルが存在しません");
-				return;
-			}
-
-			br = new BufferedReader(new FileReader(file));
-
-			String commodityreadfile;
-
-			while ((commodityreadfile = br.readLine()) != null) {
-
-				String[] commodity = commodityreadfile.split(",");
-
-				if (!commodity[0].matches("\\w{8}") || (commodity.length != 2)) {
-					System.out.println("商品定義ファイルのフォーマットが不正です");
-					return;
-				}
-				commodityNameMap.put(commodity[0], commodity[1]);
-				commoditySaleMap.put(commodity[0], 0L);
-			}
-
-		} catch (FileNotFoundException e) {
-			System.out.println("商品定義ファイルが存在しません");
+		if(! folders(args[0],"commodity.lst","商品","\\w{8}",commodityNameMap,commoditySaleMap)){
 			return;
-
-		} catch (IOException e) {
-			System.out.println("予期せぬエラーが発生しました");
-			return;
-
-		} finally {
-			if (br != null){
-				try {
-					br.close();
-				} catch (IOException e) {
-					System.out.println("予期せぬエラーが発生しました");
-					return;
-				}
-			}
 		}
 
-		// 売上集計リスト
 		File rcdCord = new File(args[0]);
 		File files[] = rcdCord.listFiles();
 		ArrayList<File> salesList1 = new ArrayList<File>();
@@ -139,8 +55,6 @@ class SalesFile {
 			}
 		}
 		for (int i = 0; i < salesList2.size() - 1; i++) {
-
-			// System.out.println(salesList2.get(1));
 
 			int name1 = salesList2.get(i + 1) - salesList2.get(i);
 			if (name1 != 1) {
@@ -210,16 +124,11 @@ class SalesFile {
 				}
 			}
 		}
-		// 支店ならびに商品別集計ファイルの作成
 
-		File newfile = new File(args[0], "branch.out");
-
-		File newfiles = new File(args[0], "commodity.out");
-
-		if(resultFile (args[0],"branch.out",branchNameMap,branchSaleMap)){
+		if(!resultFile (args[0],"branch.out",branchNameMap,branchSaleMap)){
 			return;
 		}
-		if(resultFile(args[0],"Commodity.out",commodityNameMap,commoditySaleMap)){
+		if(!resultFile(args[0],"commodity.out",commodityNameMap,commoditySaleMap)){
 			return;
 		}
 	}
@@ -264,4 +173,55 @@ class SalesFile {
 		}
 		return true;
 	}
+	public static boolean folders (String folderPathName,String folderFileName,String branchCommodity,
+			String regularExpression,HashMap<String, String> folderMapName,HashMap<String, Long> folderMapSale){
+
+		BufferedReader br = null;
+
+		try {
+
+			File file = new File(folderPathName,folderFileName);
+
+			if (!file.exists()) {
+				System.out.println(branchCommodity + "定義ファイルが存在しません");
+				return false;
+			}
+
+			br = new BufferedReader(new FileReader(file));
+
+			String readfile;
+
+			while ((readfile = br.readLine()) != null) {
+
+				String[] read =readfile.split(",");
+
+				if (!read[0].matches(regularExpression) || (read.length != 2)) {
+					System.out.println(branchCommodity + "定義ファイルのフォーマットが不正です");
+					return false;
+				}
+				folderMapName.put(read[0], read[1]);
+				folderMapSale.put(read[0], 0L);
+			}
+
+		} catch (FileNotFoundException e) {
+			System.out.println(branchCommodity + "定義ファイルが存在しません");
+			return false;
+
+		} catch (IOException e) {
+			System.out.println("予期せぬエラーが発生しました");
+			return false;
+
+		} finally {
+			if (br != null){
+				try {
+					br.close();
+				} catch (IOException e) {
+					System.out.println("予期せぬエラーが発生しました");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }
+
