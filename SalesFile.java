@@ -50,7 +50,7 @@ class SalesFile {
 
 				String[] branch = branchreadfile.split(",");
 
-				if(!branch[0].matches("\\d{3}")&&(branch.length !=2)){
+				if(!branch[0].matches("\\d{3}")||(branch.length !=2)){
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 					return;
 				}
@@ -92,7 +92,7 @@ class SalesFile {
 
 				String[] commodity = commodityreadfile.split(",");
 
-				if(!commodity[0].matches("\\w{8}")&&(commodity.length !=2)){
+				if(!commodity[0].matches("\\w{8}")||(commodity.length !=2)){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
 					return;
 				}
@@ -162,7 +162,7 @@ class SalesFile {
 					System.out.println(salesList1.get(i) .getName() + "のフォーマットが不正です");
 					return;
 				}
-				if(!salesList3.get(2).matches("^\\d{0,9}$")){
+				if(!(salesList3.get(2).matches("[0-9]*"))){
 					System.out.println("予期せぬエラーが発生しました");
 					return;
 				}
@@ -288,6 +288,8 @@ class SalesFile {
 					return;
 				}
 		}
+		System.out.println(branchSaleMap);
+		System.out.println(commoditySaleMap);
 	}
 }
 
