@@ -35,62 +35,80 @@ class SalesFile {
 		//支店定義ファイル
 		try{
 
-			File file = new File(args[0],"branch.out");
+			File file = new File(args[0],"branch.lst");
+
+			if (!file.exists()) {
+				System.out.println("支店定義ファイルが存在しません");
+				return;
+			}
 
 			br = new BufferedReader(new FileReader(file));
 
-			String a ;
+			String branchreadfile;
 
-			while((a = br.readLine())!= null){
+			while((branchreadfile = br.readLine())!= null){
 
-				String[] Branch = a.split(",",0);
-				branchNameMap.put(Branch[0],Branch[1]);
-				branchSaleMap.put(Branch[0],0L);
+				String[] branch = branchreadfile.split(",");
 
-				if(!Branch[0].matches("\\d{3}")){
+				if(!(branch.length >=2)){
+					System.out.println("支店定義ファイルのフォーマットが不正です");
+					return;
+				}
+
+				if(!branch[0].matches("\\d{3}")){
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 
 					return;
 				}
 
+				branchNameMap.put(branch[0],branch[1]);
+				branchSaleMap.put(branch[0],0L);
 			}
 
 		}catch (FileNotFoundException e) {
 			System.out.println("支店定義ファイルが存在しません");
-
 			return;
 
 		} catch (IOException e) {
-			e.printStackTrace();
 			System.out.println("予期せぬエラーが発生しました");
+			return;
 
 		} finally{
 			if (br != null)
 				try {
 					br.close();
 				} catch (IOException e) {
-					e.printStackTrace();
 					System.out.println("予期せぬエラーが発生しました");
+					return;
 				}
 		}
 		//商品定義ファイル
 		try{
 
 			File file = new File(args[0],"commodity.lst");
+			if (!file.exists()) {
+				System.out.println("商品定義ファイルが存在しません");
+				return;
+			}
 
 			br = new BufferedReader(new FileReader(file));
 
-			String a ;
+			String commodityreadfile ;
 
-			while((a = br.readLine())!= null){
+			while((commodityreadfile = br.readLine())!= null){
 
-				String[] commodity = a.split(",",0);
+				String[] commodity = commodityreadfile.split(",");
+
+				if(!(commodity.length >=2)){
+					System.out.println("商品定義ファイルのフォーマットが不正です");
+					return;
+				}
+
 				commodityNameMap.put(commodity[0],commodity[1]);
 				commoditySaleMap.put(commodity[0],0L);
 
 				if(!commodity[0].matches("\\w{8}")){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
-
 					return;
 				}
 			}
@@ -100,16 +118,16 @@ class SalesFile {
 			return;
 
 		} catch (IOException e) {
-			e.printStackTrace();
 			System.out.println("予期せぬエラーが発生しました");
+			return;
 
 		} finally {
 			if (br != null)
 				try {
 					br.close();
 				} catch (IOException e) {
-					e.printStackTrace();
 					System.out.println("予期せぬエラーが発生しました");
+					return;
 				}
 		}
 
@@ -125,17 +143,17 @@ class SalesFile {
 
 				salesList1.add(files[i]);
 
-				int name=Integer.parseInt(salesList1.get(i).getName().substring(0,8));;
+				int name=Integer.parseInt(salesList1.get(i).getName().substring(0,8));
 
 				salesList2.add(name);
 
 			}
 		}
-		for(int t =0; t<salesList2.size()-1; t++){
+		for(int i =0; i<salesList2.size()-1; i++){
 
 			//System.out.println(salesList2.get(1));
 
-			int  name1 = salesList2.get(t+1) - salesList2.get(t);
+			int  name1 = salesList2.get(i+1) - salesList2.get(i);
 			if( name1!=1 ){
 				System.out.println("売上ファイル名が連番になっていません");
 				return;
@@ -151,22 +169,22 @@ class SalesFile {
 
 				while ((List = br.readLine()) != null) {
 
-					salesList3.add(List);;
+					salesList3.add(List);
 
 				}
 
 				if (!branchNameMap.containsKey(salesList3.get(0))){
-					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "の支店コードが不正です");
+					System.out.println(salesList1.get(i) .getName() + "の支店コードが不正です");
 					return;
 				}
 
 				if (!commodityNameMap.containsKey(salesList3.get(1))){
-					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "の商品コードが不正です");
+					System.out.println(salesList1.get(i) .getName() + "の商品コードが不正です");
 					return;
 				}
 
 				if (salesList3.size() >3){
-					System.out.println("<" + salesList1.get(i) .getName() +  ">" + "のフォーマットが不正です");
+					System.out.println(salesList1.get(i) .getName() + "のフォーマットが不正です");
 					return;
 				}
 				if(!salesList3.get(2).matches("^\\d{0,9}$")){
@@ -196,16 +214,16 @@ class SalesFile {
 			return;
 
 		} catch (IOException e) {
-			e.printStackTrace();
 			System.out.println("予期せぬエラーが発生しました");
+			return;
 
 		} finally {
 			if (br != null)
 				try {
 					br.close();
 				} catch (IOException e) {
-					e.printStackTrace();
 					System.out.println("予期せぬエラーが発生しました");
+					return;
 				}
 		}
 		//支店ならびに商品別集計ファイルの作成
@@ -218,9 +236,11 @@ class SalesFile {
 			}
 		} catch (IOException e) {
 			System.out.println("例外が発生しました。");
-			System.out.println(e);
+			return;
 		}
-		File newfiles = new File(args[0],"Commodity.out");
+
+		File newfiles = new File(args[0],"commodity.out");
+
 		try {
 			if (newfiles.createNewFile()) {
 				System.out.println("ファイルの作成に成功しました。");
@@ -229,7 +249,7 @@ class SalesFile {
 			}
 		} catch (IOException e) {
 			System.out.println("例外が発生しました。");
-			System.out.println(e);
+			return;
 		}
 
 		List<Map.Entry<String,Long>> branchentries =new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
@@ -250,21 +270,22 @@ class SalesFile {
 			bw = new BufferedWriter(fw);
 
 			for (Entry<String,Long> g : branchentries) {
-				bw.write(g.getKey() +"," +  branchNameMap.get(g.getKey()) +"," + (g.getValue()) + "\r\n");
+				bw.write(g.getKey() +"," +  branchNameMap.get(g.getKey()) +"," + (g.getValue()));
+				bw.newLine();
 			}
 			bw.close();
 
 		}catch (IOException e) {
-			e.printStackTrace();
 			System.out.println("予期せぬエラーが発生しました");
+			return;
 
 		} finally {
 			if (bw != null)
 				try {
 					bw.close();
 				} catch (IOException e) {
-					e.printStackTrace();
 					System.out.println("予期せぬエラーが発生しました");
+					return;
 				}
 		}
 
@@ -286,29 +307,28 @@ class SalesFile {
 			bw = new BufferedWriter(fw);
 
 			for (Entry<String,Long> g : commodityentries) {
-				bw.write(g.getKey() +"," +  commodityNameMap.get(g.getKey()) +"," + (g.getValue()) + "\r\n");
+				bw.write(g.getKey() +"," +  commodityNameMap.get(g.getKey()) +"," + (g.getValue()));
+				bw.newLine();
 			}
 			bw.close();
 
 		}catch (IOException e) {
-			e.printStackTrace();
 			System.out.println("予期せぬエラーが発生しました");
+			return;
 
 		} finally {
 			if (bw != null)
 				try {
 					bw.close();
 				} catch (IOException e) {
-					e.printStackTrace();
 					System.out.println("予期せぬエラーが発生しました");
+					return;
 				}
 		}
+		System.out.println(branchSaleMap);
+		System.out.println(commoditySaleMap);
 	}
 }
-
-
-
-
 
 
 
